@@ -8,6 +8,10 @@ from django.test import TestCase
 
 class RubberStampTestCase(TestCase):
     def _pre_setup(self):
+        self._original_fixture_dirs = settings.FIXTURE_DIRS
+        settings.FIXTURE_DIRS = list(settings.FIXTURE_DIRS)
+        settings.FIXTURE_DIRS.append(os.path.join(os.path.dirname(__file__), 'fixtures'))
+        
         self._original_installed_apps = settings.INSTALLED_APPS
         settings.INSTALLED_APPS = list(settings.INSTALLED_APPS)
         settings.INSTALLED_APPS.append('rubberstamp.tests.testapp')
@@ -18,6 +22,6 @@ class RubberStampTestCase(TestCase):
     
     def _post_teardown(self):
         super(TestCase, self)._post_teardown()
-        settings.GEYSER_PUBLISHABLES = self._original_geyser
         settings.INSTALLED_APPS = self._original_installed_apps
+        settings.FIXTURE_DIRS = self._original_fixture_dirs
         loading.cache.loaded = False

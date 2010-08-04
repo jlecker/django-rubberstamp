@@ -1,0 +1,1 @@
+from rubberstamp.tests.discovery import *
