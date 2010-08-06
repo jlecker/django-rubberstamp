@@ -18,10 +18,13 @@ def autodiscover():
             app_label = app.split('.')[-1]
             perm_module = import_module('%s.permissions' % app)
             permissions = getattr(perm_module, 'permissions', [])
-            for (Model, (codename, name)) in permissions:
-                AppPermission.objects.get_or_create(
-                    app_label=app_label,
-                    content_type=ContentType.objects.get_for_model(Model),
-                    codename=codename,
-                    name=name
-                )
+            for (codename, description, models) in permissions:
+                if not hasattr(models, '__iter__'):
+                    models = [models]
+                for Model in models:
+                    (perm, created) = AppPermission.objects.get_or_create(
+                        app_label=app_label,
+                        codename=codename,
+                        description=description
+                    )
+                    perm.content_types.add(ContentType.objects.get_for_model(Model))

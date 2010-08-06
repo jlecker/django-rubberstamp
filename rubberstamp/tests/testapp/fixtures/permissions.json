@@ -1,0 +1,14 @@
+[
+    {
+        "model": "rubberstamp.apppermission",
+        "pk": 1,
+        "fields": {
+            "app_label": "testapp",
+            "content_types": [
+                ["testapp", "testmodel"]
+            ],
+            "codename": "use_testmodel",
+            "description": "Use TestModel"
+        }
+    }
+]
