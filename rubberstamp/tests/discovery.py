@@ -16,18 +16,18 @@ class DiscoveryTest(RubberStampTestCase):
 
     def test_autodiscover_for_single_type(self):
         self.assertRaises(AppPermission.DoesNotExist,
-            AppPermission.objects.get, app_label='testapp', codename='use_testmodel')
+            AppPermission.objects.get, app_label='testapp', codename='use')
         p.permissions = [
-            ('use_testmodel', 'Use TestModel', TestModel),
+            ('use', 'Use this object', TestModel),
         ]
         rubberstamp.autodiscover()
-        AppPermission.objects.get(app_label='testapp', codename='use_testmodel')
+        AppPermission.objects.get(app_label='testapp', codename='use')
 
     def test_autodiscover_for_multiple_types(self):
         self.assertRaises(AppPermission.DoesNotExist,
             AppPermission.objects.get, app_label='testapp', codename='use')
         p.permissions = [
-            ('use', 'Use', (TestModel, User)),
+            ('use', 'Use this object', (TestModel, User)),
         ]
         rubberstamp.autodiscover()
         perm = AppPermission.objects.get(app_label='testapp', codename='use')

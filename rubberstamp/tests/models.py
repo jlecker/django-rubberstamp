@@ -13,7 +13,21 @@ class AssignTest(RubberStampTestCase):
         self.object = TestModel.objects.get(pk=1)
     
     def test_assign_via_manager(self):
-        AppPermission.objects.assign('testapp.use_testmodel', self.user, obj=self.object)
+        # with type in perm, with object
+        AppPermission.objects.assign('testapp.use.testapp.testmodel', self.user, obj=self.object)
+        
+        # no type in perm, with object
+        AppPermission.objects.assign('testapp.use', self.user, obj=self.object)
+        
+        # with type in perm, no object
+        AppPermission.objects.assign('testapp.use.testapp.testmodel', self.user)
+        
+        # no type in perm, no object
+        self.assertRaises(ValueError, AppPermission.objects.assign, 'testapp.use', self.user)
+        
+        # with type in perm, with object, mismatched
+        newuser = User.objects.create(username='a')
+        self.assertRaises(ValueError, AppPermission.objects.assign, 'testapp.use.testapp.testmodel', self.user, obj=newuser)
 
 
 __all__ = ('AssignTest',)

@@ -7,8 +7,8 @@
             "content_types": [
                 ["testapp", "testmodel"]
             ],
-            "codename": "use_testmodel",
-            "description": "Use TestModel"
+            "codename": "use",
+            "description": "Use this object"
         }
     }
 ]
