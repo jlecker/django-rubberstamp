@@ -1,11 +1,12 @@
 [
     {
         "model": "rubberstamp.assignedpermission",
-        "pk": 1,
+        "pk": 2,
         "fields": {
             "permission": 1,
             "user": 2,
-            "content_type": ["testapp", "testmodel"]
+            "content_type": ["testapp", "testmodel"],
+            "object_id": 1
         }
     }
 ]

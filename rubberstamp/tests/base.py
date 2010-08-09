@@ -18,10 +18,15 @@ class RubberStampTestCase(TestCase):
         loading.cache.loaded = False
         call_command('syncdb', interactive=False, verbosity=0)
         
+        self._original_auth_backends = settings.AUTHENTICATION_BACKENDS
+        settings.AUTHENTICATION_BACKENDS = list(settings.AUTHENTICATION_BACKENDS)
+        settings.AUTHENTICATION_BACKENDS.append('rubberstamp.backends.AppPermissionBackend')
+        
         super(TestCase, self)._pre_setup()
     
     def _post_teardown(self):
         super(TestCase, self)._post_teardown()
+        settings.AUTHENTICATION_BACKENDS = self._original_auth_backends
         settings.INSTALLED_APPS = self._original_installed_apps
         settings.FIXTURE_DIRS = self._original_fixture_dirs
         loading.cache.loaded = False
