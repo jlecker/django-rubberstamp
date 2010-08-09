@@ -8,5 +8,15 @@
             "content_type": ["testapp", "testmodel"],
             "object_id": 1
         }
+    },
+    {
+        "model": "rubberstamp.assignedpermission",
+        "pk": 4,
+        "fields": {
+            "permission": 1,
+            "group": 1,
+            "content_type": ["testapp", "testmodel"],
+            "object_id": 1
+        }
     }
 ]

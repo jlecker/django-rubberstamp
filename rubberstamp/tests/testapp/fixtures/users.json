@@ -1,5 +1,12 @@
 [
     {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "group"
+        }
+    },
+    {
         "model": "auth.user",
         "pk": 1,
         "fields": {
@@ -17,6 +24,17 @@
             "password": "sha1$8f49e$e0cf207e2c7d718922c40f8b358e725a0edf7610",
             "is_active": true,
             "is_superuser": false
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 3,
+        "fields": {
+            "username": "grouper",
+            "password": "sha1$8f49e$e0cf207e2c7d718922c40f8b358e725a0edf7610",
+            "is_active": true,
+            "is_superuser": false,
+            "groups": [1]
         }
     }
 ]

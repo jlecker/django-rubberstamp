@@ -7,5 +7,14 @@
             "user": 2,
             "content_type": ["testapp", "testmodel"]
         }
+    },
+    {
+        "model": "rubberstamp.assignedpermission",
+        "pk": 3,
+        "fields": {
+            "permission": 1,
+            "group": 1,
+            "content_type": ["testapp", "testmodel"]
+        }
     }
 ]

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.generic import GenericForeignKey
 
@@ -31,19 +31,26 @@ class AppPermissionManager(models.Manager):
             codename=codename
         ), content_type)
     
-    def assign(self, permission, user, obj=None):
+    def assign(self, permission, user_or_group, obj=None):
         (perm, ct) = self.get_permission_and_content_type(permission, obj)
         
-        obj_id = None
-        if obj:
-            obj_id = obj.id
+        assigned_dict = {
+            'permission': perm,
+            'content_type': ct,
+            'object_id': None
+        }
         
-        return AssignedPermission.objects.get_or_create(
-            permission=perm,
-            user=user,
-            content_type=ct,
-            object_id=obj_id
-        )
+        if obj:
+            assigned_dict['object_id'] = obj.id
+
+        if isinstance(user_or_group, User):
+            assigned_dict['user'] = user_or_group
+        elif isinstance(user_or_group, Group):
+            assigned_dict['group'] = user_or_group
+        else:
+            raise ValueError('Permissions must be assigned to a User or Group instance.')
+        
+        return AssignedPermission.objects.get_or_create(**assigned_dict)
 
 
 class AppPermission(models.Model):
@@ -68,7 +75,8 @@ class AppPermission(models.Model):
 
 class AssignedPermission(models.Model):
     permission = models.ForeignKey(AppPermission)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
+    group = models.ForeignKey(Group, null=True)
     
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField(null=True)
