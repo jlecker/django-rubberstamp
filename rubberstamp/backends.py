@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from rubberstamp.models import AppPermission, AssignedPermission
 
@@ -5,6 +6,9 @@ from rubberstamp.models import AppPermission, AssignedPermission
 class AppPermissionBackend(object):
     supports_object_permissions = True
     supports_anonymous_user = True
+    
+    def _get_q_for_user(self, user):
+        return Q(user=user) | Q(group__in=user.groups.all())
     
     def has_perm(self, user, perm, obj=None):
         try:
@@ -16,24 +20,24 @@ class AppPermissionBackend(object):
         if obj:
             obj_id = obj.id
         
-        return AssignedPermission.objects.filter(
+        q = Q(
             permission=perm,
-            user=user,
             content_type=ct,
             object_id=obj_id
-        ).exists()
+        ) & self._get_q_for_user(user)
+        return AssignedPermission.objects.filter(q).exists()
     
     def has_module_perms(self, user, app_label):
-        return AssignedPermission.objects.filter(
-            permission__app_label=app_label,
-            user=user
-        ).exists()
+        q = Q(permission__app_label=app_label) & self._get_q_for_user(user)
+        return AssignedPermission.objects.filter(q).exists()
     
     def get_all_permissions(self, user, obj=None):
-        filters = {'user': user}
+        q = self._get_q_for_user(user)
         if obj:
-            filters['content_type'] = ContentType.objects.get_for_model(obj)
-            filters['object_id'] = obj.id
-        perm_ids = AssignedPermission.objects.filter(**filters).values_list('permission')
+            q = q & Q(
+                content_type=ContentType.objects.get_for_model(obj),
+                object_id=obj.id
+            )
+        perm_ids = AssignedPermission.objects.filter(q).values_list('permission')
         perms = AppPermission.objects.filter(id__in=perm_ids)
         return set(['%s.%s' % (p.app_label, p.codename) for p in perms])

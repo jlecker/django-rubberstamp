@@ -9,6 +9,8 @@ class AppPermissionManager(models.Manager):
         perm_ct = None
         bits = permission.split('.')
         if len(bits) >= 4:
+            # this is wrong, what if just a long codename
+            # this whole method needs better handling of edge cases and errors
             (app_label, codename, ct_app, ct_model) = \
                 (bits[0], '.'.join(bits[1:-2]), bits[-2], bits[-1])
             perm_ct = ContentType.objects.get(app_label=ct_app, model=ct_model)

@@ -12,7 +12,7 @@
         "model": "rubberstamp.assignedpermission",
         "pk": 3,
         "fields": {
-            "permission": 1,
+            "permission": 2,
             "group": 1,
             "content_type": ["testapp", "testmodel"]
         }

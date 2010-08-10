@@ -10,5 +10,17 @@
             "codename": "use",
             "description": "Use this object"
         }
+    },
+    {
+        "model": "rubberstamp.apppermission",
+        "pk": 2,
+        "fields": {
+            "app_label": "testapp",
+            "content_types": [
+                ["testapp", "testmodel"]
+            ],
+            "codename": "have",
+            "description": "Have this object"
+        }
     }
 ]
