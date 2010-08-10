@@ -87,6 +87,7 @@ class AppPermissionManager(models.Manager):
             assigned.delete()
             return assigned
 
+
 class AppPermission(models.Model):
     """
     Permission model which allows apps to add permissions for models in other
