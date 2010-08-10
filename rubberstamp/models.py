@@ -59,7 +59,33 @@ class AppPermissionManager(models.Manager):
             raise TypeError('Permissions must be assigned to a User or Group instance.')
         
         return AssignedPermission.objects.get_or_create(**assigned_dict)
+    
+    def remove(self, permission, user_or_group, obj=None):
+        (perm, ct) = self.get_permission_and_content_type(permission, obj)
+        
+        assigned_dict = {
+            'permission': perm,
+            'content_type': ct,
+            'object_id': None
+        }
+        
+        if obj:
+            assigned_dict['object_id'] = obj.id
 
+        if isinstance(user_or_group, User):
+            assigned_dict['user'] = user_or_group
+        elif isinstance(user_or_group, Group):
+            assigned_dict['group'] = user_or_group
+        else:
+            raise TypeError('Permissions can only be removed from a User or Group instance.')
+        
+        try:
+            assigned = AssignedPermission.objects.get(**assigned_dict)
+        except AssignedPermission.DoesNotExist:
+            return None
+        else:
+            assigned.delete()
+            return assigned
 
 class AppPermission(models.Model):
     """
