@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from rubberstamp.models import AppPermission, AssignedPermission
+from rubberstamp.exceptions import PermissionLookupError
 
 
 class AppPermissionBackend(object):
@@ -13,7 +14,7 @@ class AppPermissionBackend(object):
     def has_perm(self, user, perm, obj=None):
         try:
             (perm, ct) = AppPermission.objects.get_permission_and_content_type(perm, obj)
-        except ValueError:
+        except PermissionLookupError:
             return False
         
         obj_id = None

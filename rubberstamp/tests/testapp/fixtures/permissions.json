@@ -22,5 +22,17 @@
             "codename": "have",
             "description": "Have this object"
         }
+    },
+    {
+        "model": "rubberstamp.apppermission",
+        "pk": 3,
+        "fields": {
+            "app_label": "testapp",
+            "content_types": [
+                ["testapp", "testmodel"]
+            ],
+            "codename": "long.permission.name",
+            "description": "Do something that requires a permission with a long codename"
+        }
     }
 ]
