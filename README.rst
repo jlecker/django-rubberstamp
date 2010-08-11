@@ -1,6 +1,7 @@
-Permissions management and backend.
+Permissions manager and backend for Django 1.2, supporting object permissions
+and application-specific permissions.
 
-Requires Django 1.2, including `auth` and `contenttypes` from `contrib`.
+Requires `auth` and `contenttypes` from `contrib`.
 
 
 What does it do?
