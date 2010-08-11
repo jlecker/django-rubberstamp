@@ -1,4 +1,8 @@
-django-rubberstamp is a permissions manager and backend for Django 1.2,
+====================
+ django-rubberstamp
+====================
+
+`django-rubberstamp` is a permissions manager and backend for Django 1.2,
 supporting object permissions and application-specific permissions.
 
 Requires `auth` and `contenttypes` from `contrib`.
@@ -93,7 +97,7 @@ Assign Permissions
 ------------------
 
 Assigning permissions is done via the ``assign()`` manager method on the
-``AppPermission`` model, like so::
+``AppPermission`` model, like this::
 
     from rubberstamp.models import AppPermission
     
