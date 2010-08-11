@@ -9,6 +9,9 @@ class AppPermissionBackend(object):
     supports_anonymous_user = True
     
     def _get_q_for_user(self, user):
+        if user.is_anonymous():
+            # anonymous users have no perms
+            return Q(pk=None)
         return Q(user=user) | Q(group__in=user.groups.all())
     
     def has_perm(self, user, perm, obj=None):
