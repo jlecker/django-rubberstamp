@@ -5,6 +5,7 @@ Requires `auth` and `contenttypes` from `contrib`.
 
 
 What does it do?
+
 * Permissions are generic words (actions) that can (conceivably) be applied to
   objects of any type. Like Django auth permissions "change", "delete", etc,
   but without each permission being tied to a specific model.
