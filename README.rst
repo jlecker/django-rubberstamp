@@ -1,5 +1,5 @@
-Permissions manager and backend for Django 1.2, supporting object permissions
-and application-specific permissions.
+django-rubberstamp is a permissions manager and backend for Django 1.2,
+supporting object permissions and application-specific permissions.
 
 Requires `auth` and `contenttypes` from `contrib`.
 
@@ -12,6 +12,15 @@ What does it do?
   to, including (or especially) models in other apps.
 * Supports model (table-level) and object (row-level) permissions.
 * Works as a backend for Django 1.2.
+
+
+
+Installation
+============
+
+The easiest way to install is with `pip`, directly from github::
+
+    pip install git+http://github.com/jlecker/django-rubberstamp.git@master#egg=rubberstamp
 
 
 
