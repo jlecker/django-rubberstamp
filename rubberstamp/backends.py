@@ -1,18 +1,13 @@
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from rubberstamp.models import AppPermission, AssignedPermission
+from rubberstamp.utils import get_perm_q_for_user
 from rubberstamp.exceptions import PermissionLookupError
 
 
 class AppPermissionBackend(object):
     supports_object_permissions = True
     supports_anonymous_user = True
-    
-    def _get_q_for_user(self, user):
-        if user.is_anonymous():
-            # anonymous users have no perms
-            return Q(pk=None)
-        return Q(user=user) | Q(group__in=user.groups.all())
     
     def has_perm(self, user, perm, obj=None):
         try:
@@ -28,15 +23,15 @@ class AppPermissionBackend(object):
             permission=perm,
             content_type=ct,
             object_id=obj_id
-        ) & self._get_q_for_user(user)
+        ) & get_perm_q_for_user(user)
         return AssignedPermission.objects.filter(q).exists()
     
     def has_module_perms(self, user, app_label):
-        q = Q(permission__app_label=app_label) & self._get_q_for_user(user)
+        q = Q(permission__app_label=app_label) & get_perm_q_for_user(user)
         return AssignedPermission.objects.filter(q).exists()
     
     def get_all_permissions(self, user, obj=None):
-        q = self._get_q_for_user(user)
+        q = get_perm_q_for_user(user)
         if obj:
             q = q & Q(
                 content_type=ContentType.objects.get_for_model(obj),

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.generic import GenericForeignKey
+from rubberstamp.utils import get_perm_q_for_user
 from rubberstamp.exceptions import PermissionLookupError
 
 
@@ -86,6 +87,19 @@ class AppPermissionManager(models.Manager):
         else:
             assigned.delete()
             return assigned
+    
+    def get_permission_targets(self, permission, user):
+        (perm, ct) = self.get_permission_and_content_type(permission)
+        
+        q = models.Q(
+            permission=perm,
+            content_type=ct,
+            object_id__isnull=False
+        ) & get_perm_q_for_user(user)
+        
+        obj_ids = AssignedPermission.objects.filter(q).values('object_id')
+        return ct.model_class().objects.filter(pk__in=obj_ids)
+        
 
 
 class AppPermission(models.Model):
