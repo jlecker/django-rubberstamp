@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 
 from rubberstamp.tests.base import RubberStampTestCase
 from rubberstamp.models import AppPermission
@@ -34,4 +35,17 @@ class DiscoveryTest(RubberStampTestCase):
         self.assertEqual(len(perm.content_types.all()), 2)
 
 
-__all__ = ('DiscoveryTest',)
+class PermissionsTest(RubberStampTestCase):
+    def test_rubberstamp_permissions(self):
+        ap_ct = ContentType.objects.get_for_model(AppPermission)
+        rubberstamp.autodiscover()
+        
+        perms = AppPermission.objects.all()
+        self.assertEqual(perms.count(), 1)
+        
+        types = perms.get(codename='manage').content_types.all()
+        self.assertTrue(ap_ct in types)
+        self.assertEqual(len(types), 1)
+
+
+__all__ = ('DiscoveryTest', 'PermissionsTest')
