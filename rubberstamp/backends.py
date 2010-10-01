@@ -40,3 +40,6 @@ class AppPermissionBackend(object):
         perm_ids = AssignedPermission.objects.filter(q).values_list('permission')
         perms = AppPermission.objects.filter(id__in=perm_ids)
         return set(['%s.%s' % (p.app_label, p.codename) for p in perms])
+    
+    def authenticate(self, **credentials):
+        return None

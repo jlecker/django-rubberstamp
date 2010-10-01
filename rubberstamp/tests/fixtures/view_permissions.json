@@ -3,12 +3,12 @@
         "model": "rubberstamp.apppermission",
         "pk": 1,
         "fields": {
-            "app_label": "testapp",
+            "app_label": "rubberstamp",
+            "codename": "manage",
+            "description": "Manage this permission",
             "content_types": [
-                ["testapp", "testmodel"]
-            ],
-            "codename": "use",
-            "description": "Use this object"
+                ["rubberstamp", "apppermission"]
+            ]
         }
     },
     {
@@ -17,10 +17,11 @@
         "fields": {
             "app_label": "testapp",
             "content_types": [
-                ["testapp", "testmodel"]
+                ["testapp", "testmodel"],
+                ["testapp", "othertestmodel"]
             ],
-            "codename": "have",
-            "description": "Have this object"
+            "codename": "use",
+            "description": "Use this object"
         }
     },
     {
@@ -31,8 +32,8 @@
             "content_types": [
                 ["testapp", "testmodel"]
             ],
-            "codename": "long.permission.name",
-            "description": "Do something that requires a permission with a long codename"
+            "codename": "have",
+            "description": "Have this object"
         }
     }
 ]

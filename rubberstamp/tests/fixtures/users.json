@@ -36,5 +36,25 @@
             "is_superuser": false,
             "groups": [1]
         }
+    },
+    {
+        "model": "auth.user",
+        "pk": 4,
+        "fields": {
+            "username": "permtest4",
+            "password": "sha1$8f49e$e0cf207e2c7d718922c40f8b358e725a0edf7610",
+            "is_active": true,
+            "is_superuser": false
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 5,
+        "fields": {
+            "username": "permtest5",
+            "password": "sha1$8f49e$e0cf207e2c7d718922c40f8b358e725a0edf7610",
+            "is_active": true,
+            "is_superuser": false
+        }
     }
 ]

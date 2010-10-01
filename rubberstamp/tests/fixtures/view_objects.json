@@ -1,0 +1,17 @@
+[
+    {
+        "model": "testapp.testmodel",
+        "pk": 1,
+        "fields": {}
+    },
+    {
+        "model": "testapp.testmodel",
+        "pk": 2,
+        "fields": {}
+    },
+    {
+        "model": "testapp.othertestmodel",
+        "pk": 1,
+        "fields": {}
+    }
+]

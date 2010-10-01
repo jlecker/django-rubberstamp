@@ -13,7 +13,8 @@ class AppPermissionManager(models.Manager):
         app_label = bits.pop(0)
         if len(bits) >= 3:
             try:
-                perm_ct = ContentType.objects.get(app_label=bits[-2], model=bits[-1])
+                perm_ct = ContentType.objects.get(
+                    app_label=bits[-2], model=bits[-1])
             except ContentType.DoesNotExist:
                 codename = '.'.join(bits)
             else:
