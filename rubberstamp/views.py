@@ -33,6 +33,18 @@ def type_list(request, app_label, codename):
     )
 
 
+def object_list(request, app, code, target_app, target_model):
+    target_ct = get_object_or_404(
+        ContentType, app_label=target_app, model=target_model)
+    perm = get_object_or_404(AppPermission,
+        app_label=app, codename=code, content_types=target_ct)
+    TargetClass = target_ct.model_class()
+    return render_to_response(
+        'rubberstamp/object_list.html',
+        {'objects': TargetClass.objects.all()}
+    )
+
+
 def type_perms(request, app, code, target_app, target_model, obj_pk=None):
     target_ct = get_object_or_404(
         ContentType, app_label=target_app, model=target_model)
@@ -70,6 +82,4 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
     else:
         assign_form = PermissionAssignForm()
     context_dict = {'assign_form': assign_form}
-    if not obj_pk:
-        context_dict['objects'] = TargetClass.objects.all()
     return render_to_response('rubberstamp/type_perms.html', context_dict)

@@ -88,8 +88,7 @@ class ViewTest(RubberStampTestCase):
         
         assign_form = r.context['assign_form']
         self.assertFalse(assign_form.is_bound)
-        objects = r.context['objects']
-        self.assertEqual(len(objects), 2)
+        self.assertRaises(KeyError, lambda: r.context['objects'])
         
         post_dict = {
             'users': ['4', '5'],
@@ -140,24 +139,50 @@ class ViewTest(RubberStampTestCase):
         user5 = User.objects.get(pk=5)
         self.assertFalse(user5.has_perm('testapp.use.testapp.testmodel'))
     
-    def test_object_to_user(self):
-        xr = self.client.get('/testapp.use.testapp.testmodel/100/')
+    def test_object_list(self):
+        xr = self.client.get('/testapp.use.testapp.nomodel/objects/')
         self.assertEqual(xr.status_code, 302)
-        xr = self.client.get('/testapp.use.testapp.testmodel/1/')
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/')
         self.assertEqual(xr.status_code, 302)
         
         self.client.login(username='user', password='')
         # logged in, but without correct perm
-        xr = self.client.get('/testapp.use.testapp.testmodel/100/')
+        xr = self.client.get('/testapp.use.testapp.nomodel/objects/')
         self.assertEqual(xr.status_code, 302)
-        xr = self.client.get('/testapp.use.testapp.testmodel/1/')
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/')
         self.assertEqual(xr.status_code, 302)
         
         AppPermission.objects.assign('rubberstamp.manage.rubberstamp.apppermission', self.user)
         # nonexistent should raise 404
-        xr = self.client.get('/testapp.use.testapp.testmodel/100/')
+        xr = self.client.get('/testapp.use.testapp.nomodel/objects/')
         self.assertEqual(xr.status_code, 404)
-        r = self.client.get('/testapp.use.testapp.testmodel/1/')
+        # model to which this perm doesn't apply should raise 404
+        xr = self.client.get('/testapp.use.auth.user/objects/')
+        self.assertEqual(xr.status_code, 404)
+        r = self.client.get('/testapp.use.testapp.testmodel/objects/')
+        self.assertEqual(r.status_code, 200)
+        
+        objects = r.context['objects']
+        self.assertEqual(len(objects), 2)
+    
+    def test_object_to_user(self):
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/100/')
+        self.assertEqual(xr.status_code, 302)
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
+        self.assertEqual(xr.status_code, 302)
+        
+        self.client.login(username='user', password='')
+        # logged in, but without correct perm
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/100/')
+        self.assertEqual(xr.status_code, 302)
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
+        self.assertEqual(xr.status_code, 302)
+        
+        AppPermission.objects.assign('rubberstamp.manage.rubberstamp.apppermission', self.user)
+        # nonexistent should raise 404
+        xr = self.client.get('/testapp.use.testapp.testmodel/objects/100/')
+        self.assertEqual(xr.status_code, 404)
+        r = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
         self.assertEqual(r.status_code, 200)
         
         assign_form = r.context['assign_form']
@@ -167,7 +192,7 @@ class ViewTest(RubberStampTestCase):
         post_dict = {
             'users': ['4', '5'],
         }
-        rp = self.client.post('/testapp.use.testapp.testmodel/1/', post_dict)
+        rp = self.client.post('/testapp.use.testapp.testmodel/objects/1/', post_dict)
         self.assertEqual(rp.status_code, 200)
         assign_form = rp.context['assign_form']
         self.assertTrue(assign_form.is_valid())
