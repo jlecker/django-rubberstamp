@@ -14,6 +14,7 @@ class ViewTest(RubberStampTestCase):
         self.user = User.objects.get(username='user')
     
     def test_app_list(self):
+        """The root view shows a list of apps and the permissions they define."""
         xr = self.client.get('/')
         self.assertEqual(xr.status_code, 302)
         
@@ -39,6 +40,7 @@ class ViewTest(RubberStampTestCase):
         self.assertTrue(all(c in tp[1] for c in ['use', 'have']))
     
     def test_type_list_for_perm(self):
+        """Given a permission codename, show a list of types to which it applies."""
         xr = self.client.get('/testapp.not/')
         self.assertEqual(xr.status_code, 302)
         xr = self.client.get('/testapp.use/')
@@ -64,6 +66,7 @@ class ViewTest(RubberStampTestCase):
         self.assertTrue(otm_ct in type_list)
     
     def test_type_to_user(self):
+        """Assign a permission for a type to a user."""
         xr = self.client.get('/testapp.use.testapp.nomodel/')
         self.assertEqual(xr.status_code, 302)
         xr = self.client.get('/testapp.use.testapp.testmodel/')
@@ -101,6 +104,7 @@ class ViewTest(RubberStampTestCase):
         self.assertTrue(user4.has_perm('testapp.use.testapp.testmodel'))
     
     def test_type_to_group(self):
+        """Assign a permission for a type to a group."""
         AppPermission.objects.assign('rubberstamp.manage.rubberstamp.apppermission', self.user)
         self.client.login(username='user', password='')
         post_dict = {
@@ -118,6 +122,7 @@ class ViewTest(RubberStampTestCase):
         self.assertTrue(user4.has_perm('testapp.use.testapp.testmodel'))
     
     def test_type_remove(self):
+        """Remove (un-assign) permissions from a user or group."""
         AppPermission.objects.assign('rubberstamp.manage.rubberstamp.apppermission', self.user)
         self.client.login(username='user', password='')
         user4 = User.objects.get(pk=4)
@@ -140,6 +145,7 @@ class ViewTest(RubberStampTestCase):
         self.assertFalse(user5.has_perm('testapp.use.testapp.testmodel'))
     
     def test_object_list(self):
+        """Given a permission and type, return a list of objects of that type."""
         xr = self.client.get('/testapp.use.testapp.nomodel/objects/')
         self.assertEqual(xr.status_code, 302)
         xr = self.client.get('/testapp.use.testapp.testmodel/objects/')
@@ -166,6 +172,7 @@ class ViewTest(RubberStampTestCase):
         self.assertEqual(len(objects), 2)
     
     def test_object_to_user(self):
+        """Assign a permission for an object to a user."""
         xr = self.client.get('/testapp.use.testapp.testmodel/objects/100/')
         self.assertEqual(xr.status_code, 302)
         xr = self.client.get('/testapp.use.testapp.testmodel/objects/1/')

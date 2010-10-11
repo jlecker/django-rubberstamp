@@ -8,6 +8,15 @@ from rubberstamp.forms import PermissionAssignForm
 
 
 def app_list(request):
+    """
+    Returns a list of apps and their permission codenames.
+    
+    Renders the template ``'rubberstamp/app_list.html'``, with context
+    containing ``app_perms``, a list of tuples like::
+    
+        [('app_label', ['codename', 'codename', ...]), ...]
+    """
+    
     app_codes = AppPermission.objects.order_by('app_label', 'codename') \
         .values_list('app_label', 'codename')
     on_app = None
@@ -18,6 +27,8 @@ def app_list(request):
             app_perms.append((app, [])) # add app and empty perm list
         app_perms[-1][1].append(code) # add this code to the current app's list
     
+    # app perms should be a list of tuples like
+    # [('app_label', ['codename', 'codename', ...]), ...]
     return render_to_response(
         'rubberstamp/app_list.html',
         {'app_perms': app_perms}
@@ -25,6 +36,14 @@ def app_list(request):
 
 
 def type_list(request, app_label, codename):
+    """
+    Given an app label and permission codename, returns a list of types to
+    which that permission can apply.
+    
+    Renders the template ``'rubberstamp/type_list.html'``, with context
+    containing ``types``, a list of `ContentType` objects.
+    """
+    
     perm = get_object_or_404(
         AppPermission, app_label=app_label, codename=codename)
     return render_to_response(
@@ -34,6 +53,15 @@ def type_list(request, app_label, codename):
 
 
 def object_list(request, app, code, target_app, target_model):
+    """
+    Given an app label and permission codename, as well as a "target" app label
+    and model name, returns a list of objects of the target type to which the
+    permission can apply.
+    
+    Renders the template ``'rubberstamp/object_list.html'``, with context
+    containing ``objects``, a list of instances of the appropriate type.
+    """
+    
     target_ct = get_object_or_404(
         ContentType, app_label=target_app, model=target_model)
     perm = get_object_or_404(AppPermission,
@@ -46,6 +74,18 @@ def object_list(request, app, code, target_app, target_model):
 
 
 def type_perms(request, app, code, target_app, target_model, obj_pk=None):
+    """
+    Takes the same arguments as ``object_list``, but returns a form to specify
+    users and groups to assign/unassign the given permission to.
+    
+    Also accepts an option argument, the primary key of an object of the given
+    type; if given, then the permissions will be assigned for that specific
+    object instead of the type.
+    
+    Renders the template ``'rubberstamp/type_perms.html'``, with context
+    containing ``assign_form``, a Django form to select users and groups.
+    """
+    
     target_ct = get_object_or_404(
         ContentType, app_label=target_app, model=target_model)
     perm = get_object_or_404(AppPermission,
