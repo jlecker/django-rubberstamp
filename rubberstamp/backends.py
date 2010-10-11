@@ -6,6 +6,8 @@ from rubberstamp.exceptions import PermissionLookupError
 
 
 class AppPermissionBackend(object):
+    """A permission backend to support AppPermission."""
+    
     supports_object_permissions = True
     supports_anonymous_user = True
     
