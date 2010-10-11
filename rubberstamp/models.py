@@ -8,6 +8,19 @@ from rubberstamp.exceptions import PermissionLookupError
 
 class AppPermissionManager(models.Manager):
     def get_permission_and_content_type(self, permission, obj=None):
+        """
+        Given a permission string and (optionally) an object, returns a tuple
+        of an AppPermission instance and a ContentType instance corresponding
+        to that string and object.
+        
+        The permission string is given in the dotted form, either
+        `'app_label.codename'` or
+        `'app_label.codename.target_app.target_model'`.
+        
+        If the correct AppPermission and ContentType cannot be determined for
+        the passed parameters, a `PermissionLookupError` is raised.
+        """
+        
         perm_ct = None
         bits = permission.split('.')
         app_label = bits.pop(0)
@@ -33,15 +46,24 @@ class AppPermissionManager(models.Manager):
             raise PermissionLookupError('ContentType in permission and passed object mismatched.')
         
         try:
-            return (self.get(
-                app_label=app_label,
-                content_types=content_type,
-                codename=codename
-            ), content_type)
+            return (
+                self.get(
+                    app_label=app_label,
+                    content_types=content_type,
+                    codename=codename
+                ),
+                content_type
+            )
         except self.model.DoesNotExist:
             raise PermissionLookupError('AppPermission not found.')
     
     def assign(self, permission, user_or_group, obj=None):
+        """
+        Assigns the given permission to the given user or group.
+        
+        If an object is given, assigns the permission for that object.
+        """
+        
         (perm, ct) = self.get_permission_and_content_type(permission, obj)
         
         assigned_dict = {
@@ -63,6 +85,12 @@ class AppPermissionManager(models.Manager):
         return AssignedPermission.objects.get_or_create(**assigned_dict)
     
     def remove(self, permission, user_or_group, obj=None):
+        """
+        Removes the given permission from the given user or group.
+        
+        If an object is given, removes the permission for that object.
+        """
+        
         (perm, ct) = self.get_permission_and_content_type(permission, obj)
         
         assigned_dict = {
@@ -90,6 +118,11 @@ class AppPermissionManager(models.Manager):
             return assigned
     
     def get_permission_targets(self, permission, user):
+        """
+        Given a (long) permission string and a user, returns a QuerySet of
+        objects for which that user has that permission.
+        """
+        
         (perm, ct) = self.get_permission_and_content_type(permission)
         
         q = models.Q(
@@ -124,6 +157,8 @@ class AppPermission(models.Model):
 
 
 class AssignedPermission(models.Model):
+    """An AppPermission which has been assigned to a user or group."""
+    
     permission = models.ForeignKey(AppPermission)
     user = models.ForeignKey(User, null=True)
     group = models.ForeignKey(Group, null=True)
