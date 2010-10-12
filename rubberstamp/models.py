@@ -11,7 +11,7 @@ class AppPermissionManager(models.Manager):
         """
         Given a permission string and (optionally) an object, returns a tuple
         of an AppPermission instance and a ContentType instance corresponding
-        to that string and object.
+        to that string (and object, if given).
         
         The permission string is given in the dotted form, either
         `'app_label.codename'` or
@@ -25,6 +25,7 @@ class AppPermissionManager(models.Manager):
         bits = permission.split('.')
         app_label = bits.pop(0)
         if len(bits) >= 3:
+            # either a ContentType was given, or this is a long codename
             try:
                 perm_ct = ContentType.objects.get(
                     app_label=bits[-2], model=bits[-1])
@@ -59,7 +60,8 @@ class AppPermissionManager(models.Manager):
     
     def assign(self, permission, user_or_group, obj=None):
         """
-        Assigns the given permission to the given user or group.
+        Assigns the given permission to the given user or group, and returns
+        the AssignedPermission instance.
         
         If an object is given, assigns the permission for that object.
         """
@@ -86,7 +88,8 @@ class AppPermissionManager(models.Manager):
     
     def remove(self, permission, user_or_group, obj=None):
         """
-        Removes the given permission from the given user or group.
+        Removes the given permission from the given user or group, and returns
+        the deleted AssignedPermission instance or None if not found.
         
         If an object is given, removes the permission for that object.
         """
@@ -126,10 +129,10 @@ class AppPermissionManager(models.Manager):
         (perm, ct) = self.get_permission_and_content_type(permission)
         
         q = models.Q(
-            permission=perm,
-            content_type=ct,
-            object_id__isnull=False
-        ) & get_perm_q_for_user(user)
+                permission=perm,
+                content_type=ct,
+                object_id__isnull=False
+            ) & get_perm_q_for_user(user)
         
         obj_ids = AssignedPermission.objects.filter(q).values('object_id')
         return ct.model_class().objects.filter(pk__in=obj_ids)
@@ -165,4 +168,4 @@ class AssignedPermission(models.Model):
     
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField(null=True)
-    object = GenericForeignKey()
+    content_object = GenericForeignKey()

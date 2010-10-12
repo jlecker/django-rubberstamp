@@ -92,9 +92,9 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
         app_label=app, codename=code, content_types=target_ct)
     TargetClass = target_ct.model_class()
     if obj_pk:
-        object = get_object_or_404(TargetClass, pk=obj_pk)
+        obj = get_object_or_404(TargetClass, pk=obj_pk)
     else:
-        object = None
+        obj = None
     if request.method == 'POST':
         assign_form = PermissionAssignForm(request.POST)
         if assign_form.is_valid():
@@ -112,13 +112,13 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
             selected_users = set(assign_form.cleaned_data['users'])
             selected_groups = set(assign_form.cleaned_data['groups'])
             for user in selected_users - current_users:
-                AppPermission.objects.assign(perm_name, user, obj=object)
+                AppPermission.objects.assign(perm_name, user, obj=obj)
             for group in selected_groups - current_groups:
-                AppPermission.objects.assign(perm_name, group, obj=object)
+                AppPermission.objects.assign(perm_name, group, obj=obj)
             for user in current_users - selected_users:
-                AppPermission.objects.remove(perm_name, user, obj=object)
+                AppPermission.objects.remove(perm_name, user, obj=obj)
             for group in current_groups - selected_groups:
-                AppPermission.objects.remove(perm_name, group, obj=object)
+                AppPermission.objects.remove(perm_name, group, obj=obj)
     else:
         assign_form = PermissionAssignForm()
     context_dict = {'assign_form': assign_form}
