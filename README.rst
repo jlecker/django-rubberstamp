@@ -148,3 +148,55 @@ Removing permissions is done via the ``remove()`` manager method on the
 This remove the `use` permission on the model `TestModel` from the user
 represented by `user_object`. The ``remove()`` method accepts the same syntax
 variations as ``assign()``.
+
+
+
+Views
+=====
+
+`django-rubberstamp` comes with several views to manage permissions. The
+easiest way to use them is to include `rubberstamp`'s URLs in your URLconf.
+Something like this in your ``urlpatterns`` should suffice::
+
+    ('perms/', include('rubberstamp.urls')),
+
+This will add URL patterns for all of the following views. Example URLs are
+based on this pattern as well.
+
+
+app_list
+--------
+
+``/perms/`` - Renders the template ``'rubberstamp/app_list.html'``, with
+context containing ``app_perms``, a list of tuples like::
+
+    [('app_label', ['codename', 'codename', ...]), ...]
+
+
+type_list
+---------
+
+``/perms/<app_label>.<codename>/`` - Renders the template
+``'rubberstamp/type_list.html'``, with context containing ``types``, a list of
+`ContentType` objects for the types to which the given permission can apply.
+
+
+object_list
+-----------
+
+``/perms/<app_label>.<codename>.<target_app>.<target_model>/objects/`` -
+Renders the template ``'rubberstamp/object_list.html'``, with context
+containing ``objects``, a list of instances of the target type to which the
+given permission can apply.
+
+
+type_perms
+----------
+
+``/perms/<app_label>.<codename>.<target_app>.<target_model>/`` or
+``/perms/<app_label>.<codename>.<target_app>.<target_model>/objects/<obj_pk>/``
+- The actual permission assignment view. Renders the template
+``'rubberstamp/type_perms.html'``, with context containing ``assign_form``, a
+Django form to select users and groups. In the second form (with an object's
+primary key given), assigns permissions for a specific object. Otherwise
+assigns permissions for the target type.
