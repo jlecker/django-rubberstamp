@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
 
 from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.models import ContentType
@@ -31,7 +32,8 @@ def app_list(request):
     # [('app_label', ['codename', 'codename', ...]), ...]
     return render_to_response(
         'rubberstamp/app_list.html',
-        {'app_perms': app_perms}
+        {'app_perms': app_perms},
+        RequestContext(request)
     )
 
 
@@ -48,7 +50,8 @@ def type_list(request, app_label, codename):
         AppPermission, app_label=app_label, codename=codename)
     return render_to_response(
         'rubberstamp/type_list.html',
-        {'types': perm.content_types.all()}
+        {'types': perm.content_types.all()},
+        RequestContext(request)
     )
 
 
@@ -69,7 +72,8 @@ def object_list(request, app, code, target_app, target_model):
     TargetClass = target_ct.model_class()
     return render_to_response(
         'rubberstamp/object_list.html',
-        {'objects': TargetClass.objects.all()}
+        {'objects': TargetClass.objects.all()},
+        RequestContext(request)
     )
 
 
@@ -122,4 +126,8 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
     else:
         assign_form = PermissionAssignForm()
     context_dict = {'assign_form': assign_form}
-    return render_to_response('rubberstamp/type_perms.html', context_dict)
+    return render_to_response(
+        'rubberstamp/type_perms.html',
+        context_dict,
+        RequestContext(request)
+    )
