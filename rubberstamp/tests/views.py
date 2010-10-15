@@ -26,44 +26,34 @@ class ViewTest(RubberStampTestCase):
         r = self.client.get('/')
         self.assertEqual(r.status_code, 200)
         
-        # app perms should be a list of tuples like
-        # [('app_label', ['codename', 'codename', ...]), ...]
-        ap = r.context['app_perms']
-        self.assertEqual(len(ap), 2)
-        rp = ap[0]
-        self.assertEqual(rp[0], 'rubberstamp')
-        self.assertEqual(len(rp[1]), 1)
-        self.assertEqual(rp[1][0], 'manage')
-        tp = ap[1]
-        self.assertEqual(tp[0], 'testapp')
-        self.assertEqual(len(tp[1]), 2)
-        self.assertTrue(all(c in tp[1] for c in ['use', 'have']))
-    
-    def test_type_list_for_perm(self):
-        """Given a permission codename, show a list of types to which it applies."""
-        xr = self.client.get('/testapp.not/')
-        self.assertEqual(xr.status_code, 302)
-        xr = self.client.get('/testapp.use/')
-        self.assertEqual(xr.status_code, 302)
-        
-        self.client.login(username='user', password='')
-        xr = self.client.get('/testapp.not/')
-        self.assertEqual(xr.status_code, 302)
-        xr = self.client.get('/testapp.use/')
-        self.assertEqual(xr.status_code, 302)
-        
-        AppPermission.objects.assign('rubberstamp.manage.rubberstamp.apppermission', self.user)
-        xr = self.client.get('/testapp.not/')
-        self.assertEqual(xr.status_code, 404)
-        r = self.client.get('/testapp.use/')
-        self.assertEqual(r.status_code, 200)
-        
-        type_list = r.context['types']
-        self.assertEqual(len(type_list), 2)
+        ap_ct = ContentType.objects.get(app_label='rubberstamp', model='apppermission')
         tm_ct = ContentType.objects.get(app_label='testapp', model='testmodel')
-        self.assertTrue(tm_ct in type_list)
         otm_ct = ContentType.objects.get(app_label='testapp', model='othertestmodel')
-        self.assertTrue(otm_ct in type_list)
+        apps = [
+            {
+                'label': u'rubberstamp',
+                'perms': [
+                    {
+                        'codename': u'manage',
+                        'types': [ap_ct]
+                    },
+                ],
+            },
+            {
+                'label': u'testapp',
+                'perms': [
+                    {
+                        'codename': u'have',
+                        'types': [tm_ct]
+                    },
+                    {
+                        'codename': u'use',
+                        'types': [otm_ct, tm_ct]
+                    },
+                ],
+            },
+        ]
+        self.assertEqual(repr(r.context['apps']), repr(apps))
     
     def test_type_to_user(self):
         """Assign a permission for a type to a user."""

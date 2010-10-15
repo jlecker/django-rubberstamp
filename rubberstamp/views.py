@@ -13,44 +13,39 @@ def app_list(request):
     Returns a list of apps and their permission codenames.
     
     Renders the template ``'rubberstamp/app_list.html'``, with context
-    containing ``app_perms``, a list of tuples like::
+    containing ``apps``, a list of dicts like::
     
-        [('app_label', ['codename', 'codename', ...]), ...]
+        [
+            {
+                'label': 'app_label',
+                'perms': [
+                    {
+                        'codename': 'permission_codename',
+                        'types': [content_type_1, content_type_2, ...],
+                    },
+                    ...
+                ],
+            },
+            ...
+        ]
     """
     
-    app_codes = AppPermission.objects.order_by('app_label', 'codename') \
-        .values_list('app_label', 'codename')
+    app_perms = AppPermission.objects.order_by('app_label', 'codename')
     on_app = None
-    app_perms = []
-    for (app, code) in app_codes:
+    apps = []
+    for perm in app_perms:
+        app = perm.app_label
         if app != on_app:
             on_app = app
-            app_perms.append((app, [])) # add app and empty perm list
-        app_perms[-1][1].append(code) # add this code to the current app's list
+            # add app and empty perm list
+            apps.append({'label': app, 'perms': []})
+        # add this code to the current app's list
+        apps[-1]['perms'].append(
+            {'codename': perm.codename, 'types': perm.content_types.order_by('app_label', 'model')})
     
-    # app perms should be a list of tuples like
-    # [('app_label', ['codename', 'codename', ...]), ...]
     return render_to_response(
         'rubberstamp/app_list.html',
-        {'app_perms': app_perms},
-        RequestContext(request)
-    )
-
-
-def type_list(request, app_label, codename):
-    """
-    Given an app label and permission codename, returns a list of types to
-    which that permission can apply.
-    
-    Renders the template ``'rubberstamp/type_list.html'``, with context
-    containing ``types``, a list of `ContentType` objects.
-    """
-    
-    perm = get_object_or_404(
-        AppPermission, app_label=app_label, codename=codename)
-    return render_to_response(
-        'rubberstamp/type_list.html',
-        {'types': perm.content_types.all()},
+        {'apps': apps},
         RequestContext(request)
     )
 

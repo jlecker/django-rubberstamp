@@ -168,17 +168,21 @@ app_list
 --------
 
 ``/perms/`` - Renders the template ``'rubberstamp/app_list.html'``, with
-context containing ``app_perms``, a list of tuples like::
+context containing ``apps``, a list of dicts like::
 
-    [('app_label', ['codename', 'codename', ...]), ...]
-
-
-type_list
----------
-
-``/perms/<app_label>.<codename>/`` - Renders the template
-``'rubberstamp/type_list.html'``, with context containing ``types``, a list of
-`ContentType` objects for the types to which the given permission can apply.
+    [
+        {
+            'label': 'app_label',
+            'perms': [
+                {
+                    'codename': 'permission_codename',
+                    'types': [content_type_1, content_type_2, ...],
+                },
+                ...
+            ],
+        },
+        ...
+    ]
 
 
 object_list
