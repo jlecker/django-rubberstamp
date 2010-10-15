@@ -57,7 +57,11 @@ def object_list(request, app, code, target_app, target_model):
     permission can apply.
     
     Renders the template ``'rubberstamp/object_list.html'``, with context
-    containing ``objects``, a list of instances of the appropriate type.
+    containing the following::
+    
+    * ``perm``, the `AppPermission` instance
+    * ``type``, the `ContentType` of the objects
+    * ``objects``, a list of instances of the appropriate type
     """
     
     target_ct = get_object_or_404(
@@ -67,7 +71,11 @@ def object_list(request, app, code, target_app, target_model):
     TargetClass = target_ct.model_class()
     return render_to_response(
         'rubberstamp/object_list.html',
-        {'objects': TargetClass.objects.all()},
+        {
+            'perm': perm,
+            'type': target_ct,
+            'objects': TargetClass.objects.all(),
+        },
         RequestContext(request)
     )
 
@@ -77,12 +85,20 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
     Takes the same arguments as ``object_list``, but returns a form to specify
     users and groups to assign/unassign the given permission to.
     
-    Also accepts an option argument, the primary key of an object of the given
-    type; if given, then the permissions will be assigned for that specific
-    object instead of the type.
+    Also accepts an optional argument, the primary key of an object of the
+    given type; if given, then the permissions will be assigned for that
+    specific object instead of the type.
     
     Renders the template ``'rubberstamp/type_perms.html'``, with context
-    containing ``assign_form``, a Django form to select users and groups.
+    containing the following:
+    
+    * ``perm``, the `AppPermission` instance
+    * ``type``, the `ContentType` of the objects
+    * ``assign_form``, a Django form to select users and groups
+    
+    If an object is specific, the context will also include:
+    
+    * ``object``, the object
     """
     
     target_ct = get_object_or_404(
@@ -120,7 +136,13 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
                 AppPermission.objects.remove(perm_name, group, obj=obj)
     else:
         assign_form = PermissionAssignForm()
-    context_dict = {'assign_form': assign_form}
+    context_dict = {
+        'perm': perm,
+        'type': target_ct,
+        'assign_form': assign_form,
+    }
+    if obj:
+        context_dict['object'] = obj
     return render_to_response(
         'rubberstamp/type_perms.html',
         context_dict,

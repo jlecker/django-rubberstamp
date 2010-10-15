@@ -190,8 +190,11 @@ object_list
 
 ``/perms/<app_label>.<codename>.<target_app>.<target_model>/objects/`` -
 Renders the template ``'rubberstamp/object_list.html'``, with context
-containing ``objects``, a list of instances of the target type to which the
-given permission can apply.
+containing the following::
+
+* ``perm``, the `AppPermission` instance
+* ``type``, the `ContentType` of the objects
+* ``objects``, a list of instances of the appropriate type
 
 
 type_perms
@@ -200,7 +203,15 @@ type_perms
 ``/perms/<app_label>.<codename>.<target_app>.<target_model>/`` or
 ``/perms/<app_label>.<codename>.<target_app>.<target_model>/objects/<obj_pk>/``
 - The actual permission assignment view. Renders the template
-``'rubberstamp/type_perms.html'``, with context containing ``assign_form``, a
-Django form to select users and groups. In the second form (with an object's
-primary key given), assigns permissions for a specific object. Otherwise
-assigns permissions for the target type.
+``'rubberstamp/type_perms.html'``, with context containing the following:
+    
+* ``perm``, the `AppPermission` instance
+* ``type``, the `ContentType` of the objects
+* ``assign_form``, a Django form to select users and groups
+
+If an object is specified, the context will also include:
+
+* ``object``, the object
+
+In the second form (with an object's primary key given), assigns permissions
+for a specific object. Otherwise assigns permissions for the target type.
