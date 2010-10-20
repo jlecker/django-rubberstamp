@@ -25,15 +25,28 @@ class DiscoveryTest(RubberStampTestCase):
         AppPermission.objects.get(app_label='testapp', codename='use')
 
     def test_autodiscover_for_multiple_types(self):
-        self.assertRaises(AppPermission.DoesNotExist,
-            AppPermission.objects.get, app_label='testapp', codename='use')
         p.permissions = [
             ('use', 'Use this object', (TestModel, User)),
         ]
         rubberstamp.autodiscover()
         perm = AppPermission.objects.get(app_label='testapp', codename='use')
         self.assertEqual(len(perm.content_types.all()), 2)
-
+    
+    def test_autodiscover_description_conflict(self):
+        p.permissions = [
+            ('use', 'Use this object', TestModel),
+        ]
+        rubberstamp.autodiscover()
+        perm1 = AppPermission.objects.get(app_label='testapp', codename='use')
+        self.assertEqual(perm1.description, 'Use this object')
+        
+        p.permissions = [
+            ('use', 'Use this', TestModel),
+        ]
+        rubberstamp.autodiscover()
+        perm2 = AppPermission.objects.get(app_label='testapp', codename='use')
+        self.assertEqual(perm2.description, 'Use this')
+        self.assertEqual(perm1, perm2)
 
 class PermissionsTest(RubberStampTestCase):
     def test_rubberstamp_permissions(self):

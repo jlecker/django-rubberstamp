@@ -25,6 +25,9 @@ def autodiscover():
                     (perm, created) = AppPermission.objects.get_or_create(
                         app_label=app_label,
                         codename=codename,
-                        description=description
+                        defaults={'description': description},
                     )
+                    if perm.description != description:
+                        perm.description = description
+                        perm.save()
                     perm.content_types.add(ContentType.objects.get_for_model(Model))
