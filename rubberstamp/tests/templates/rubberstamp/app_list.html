@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <ul>
+    {% for app in apps %}
+        <li><h1 class="app">{{ app.label}}</h1>
+            <ul>
+            {% for perm in app.perms %}
+                <li><h2>{{ perm.codename }}</h2>
+                    <ul>
+                    {% for type in perm.types %}
+                        <li>{{ type.app_label }} - {{ type.name }}:
+                            <a href="{% url rubberstamp_type_perms app.label perm.codename type.app_label type.model %}">permissions</a>
+                            <a href="{% url rubberstamp_object_list app.label perm.codename type.app_label type.model %}">objects</a>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock content %}

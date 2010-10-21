@@ -1,1 +1,14 @@
+{% extends "base.html" %}
 
+{% block content %}
+    <h1>{{ perm }}.{{ type.app_label }}.{{ type.model }}</h1>
+    {% if object %}<h2>{{ object }}</h2>{% endif %}
+    <form method="POST">
+        <h3>Users</h3>
+        {{ assign_form.users }}
+        <h3>Groups</h3>
+        {{ assign_form.groups }}
+        <br />
+        <input type="submit" value="save permissions" />
+    </form>
+{% endblock content %}

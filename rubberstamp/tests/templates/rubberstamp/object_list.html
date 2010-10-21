@@ -1,1 +1,9 @@
+{% extends "base.html" %}
 
+{% block content %}
+    <ul><h1>{{ perm }}</h1>
+    {% for object in objects %}
+        <li><a href="{% url rubberstamp_object_perms perm.app_label perm.codename type.app_label type.model object.pk %}">{{ object }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock content %}
