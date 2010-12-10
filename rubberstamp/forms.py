@@ -7,6 +7,6 @@ class PermissionAssignForm(forms.Form):
     """A form to choose users and groups, to assign perms to them."""
     
     users = forms.ModelMultipleChoiceField(
-        required=False, queryset=User.objects.all())
+        required=False, queryset=User.objects.order_by('username'))
     groups = forms.ModelMultipleChoiceField(
-        required=False, queryset=Group.objects.all())
+        required=False, queryset=Group.objects.order_by('name'))

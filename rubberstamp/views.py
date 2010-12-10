@@ -106,24 +106,31 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
     perm = get_object_or_404(AppPermission,
         app_label=app, codename=code, content_types=target_ct)
     TargetClass = target_ct.model_class()
+    
     if obj_pk:
         obj = get_object_or_404(TargetClass, pk=obj_pk)
     else:
         obj = None
+    
+    perm_name = '%s.%s.%s.%s' % (app, code, target_app, target_model)
+    perm_filter = {
+        'permission': perm,
+        'content_type': target_ct,
+    }
+    perms = AssignedPermission.objects.filter(
+        **perm_filter).select_related('user', 'group')
+    
+    current_users = set(User.objects.filter(
+        id__in=perms.filter(user__isnull=False).values_list('user')))
+    current_groups = set(Group.objects.filter(
+        id__in=perms.filter(group__isnull=False).values_list('group')))
+    initial = {
+        'users': list(current_users),
+        'groups': list(current_groups)
+    }
     if request.method == 'POST':
-        assign_form = PermissionAssignForm(request.POST)
+        assign_form = PermissionAssignForm(request.POST, initial=initial)
         if assign_form.is_valid():
-            perm_name = '%s.%s.%s.%s' % (app, code, target_app, target_model)
-            perm_filter = {
-                'permission': perm,
-                'content_type': target_ct,
-            }
-            perms = AssignedPermission.objects.filter(
-                **perm_filter).select_related('user', 'group')
-            current_users = set(User.objects.filter(
-                id__in=perms.filter(user__isnull=False).values_list('user')))
-            current_groups = set(Group.objects.filter(
-                id__in=perms.filter(group__isnull=False).values_list('group')))
             selected_users = set(assign_form.cleaned_data['users'])
             selected_groups = set(assign_form.cleaned_data['groups'])
             for user in selected_users - current_users:
@@ -135,7 +142,7 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
             for group in current_groups - selected_groups:
                 AppPermission.objects.remove(perm_name, group, obj=obj)
     else:
-        assign_form = PermissionAssignForm()
+        assign_form = PermissionAssignForm(initial=initial)
     context_dict = {
         'perm': perm,
         'type': target_ct,

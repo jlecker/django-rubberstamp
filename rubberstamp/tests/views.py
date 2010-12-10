@@ -194,8 +194,23 @@ class ViewTest(RubberStampTestCase):
         assign_form = rp.context['assign_form']
         self.assertTrue(assign_form.is_valid())
         user4 = User.objects.get(pk=4)
-        object = TestModel.objects.get(pk=1)
-        self.assertTrue(user4.has_perm('testapp.use.testapp.testmodel', obj=object))
+        obj = TestModel.objects.get(pk=1)
+        self.assertTrue(user4.has_perm('testapp.use.testapp.testmodel', obj=obj))
+    
+    def test_form_preselection(self):
+        AppPermission.objects.assign('rubberstamp.manage.rubberstamp.apppermission', self.user)
+        self.client.login(username='user', password='')
+        
+        r = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
+        form = r.context['assign_form']
+        self.assertEqual(form.initial['users'], [])
+        
+        user4 = User.objects.get(pk=4)
+        obj = TestModel.objects.get(pk=1)
+        AppPermission.objects.assign('testapp.use.testapp.testmodel', user4, obj=obj)
+        r = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
+        form = r.context['assign_form']
+        self.assertEqual(form.initial['users'], [user4])
 
 
 __all__ = ('ViewTest',)
