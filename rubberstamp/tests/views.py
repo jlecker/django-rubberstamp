@@ -207,6 +207,15 @@ class ViewTest(RubberStampTestCase):
         
         user4 = User.objects.get(pk=4)
         obj = TestModel.objects.get(pk=1)
+        AppPermission.objects.assign('testapp.use.testapp.testmodel', user4)
+        r = self.client.get('/testapp.use.testapp.testmodel/')
+        form = r.context['assign_form']
+        self.assertEqual(form.initial['users'], [user4])
+        
+        r = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
+        form = r.context['assign_form']
+        self.assertEqual(form.initial['users'], [])
+        
         AppPermission.objects.assign('testapp.use.testapp.testmodel', user4, obj=obj)
         r = self.client.get('/testapp.use.testapp.testmodel/objects/1/')
         form = r.context['assign_form']

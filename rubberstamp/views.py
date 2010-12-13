@@ -116,6 +116,7 @@ def type_perms(request, app, code, target_app, target_model, obj_pk=None):
     perm_filter = {
         'permission': perm,
         'content_type': target_ct,
+        'object_id': obj_pk
     }
     perms = AssignedPermission.objects.filter(
         **perm_filter).select_related('user', 'group')
