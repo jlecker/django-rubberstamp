@@ -136,6 +136,9 @@ class AppPermissionManager(models.Manager):
         
         obj_ids = AssignedPermission.objects.filter(q).values('object_id')
         return ct.model_class().objects.filter(pk__in=obj_ids)
+    
+    def get_by_natural_key(self, app_label, codename):
+        return self.get(app_label=app_label, codename=codename)
         
 
 
@@ -157,6 +160,9 @@ class AppPermission(models.Model):
     
     def __unicode__(self):
         return '%s.%s' % (self.app_label, self.codename)
+    
+    def natural_key(self):
+        return (self.app_label, self.codename)
 
 
 class AssignedPermission(models.Model):
