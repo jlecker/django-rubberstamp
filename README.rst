@@ -190,7 +190,7 @@ object_list
 
 ``/perms/<app_label>.<codename>.<target_app>.<target_model>/objects/`` -
 Renders the template ``'rubberstamp/object_list.html'``, with context
-containing the following::
+containing the following:
 
 * ``perm``, the `AppPermission` instance
 * ``type``, the `ContentType` of the objects
