@@ -1,3 +1,6 @@
+__version__ = "0.2dev1"
+
+
 def autodiscover():
     """
     Auto-discover INSTALLED_APPS permission.py modules, failing silently when
