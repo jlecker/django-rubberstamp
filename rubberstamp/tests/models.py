@@ -290,35 +290,6 @@ class RemoveGroupTest(RubberStampTestCase):
         self.assertEqual(AssignedPermission.objects.all().count(), 4)
 
 
-class GetPermissionTargetsTest(RubberStampTestCase):
-    fixtures = ['users.json', 'objects.json', 'permissions.json', 'assigned_object.json']
-    
-    def test_none_assigned(self):
-        user = User.objects.get(pk=2)
-        self.assertEqual(len(AppPermission.objects.get_permission_targets(
-            'testapp.have.testapp.testmodel', user)), 0)
-    
-    def test_no_content_type(self):
-        user = User.objects.get(pk=2)
-        self.assertRaises(PermissionLookupError,
-            AppPermission.objects.get_permission_targets, 'testapp.use', user)
-    
-    def test_user_assigned(self):
-        user = User.objects.get(pk=2)
-        object = TestModel.objects.get(pk=1)
-        list = AppPermission.objects.get_permission_targets(
-            'testapp.use.testapp.testmodel', user)
-        self.assertEqual(len(list), 1)
-        self.assertEqual(list[0], object)
-    
-    def test_group_assigned(self):
-        grouper = User.objects.get(pk=3)
-        self.assertEqual(len(AppPermission.objects.get_permission_targets(
-            'testapp.use.testapp.testmodel', grouper)), 0)
-        self.assertEqual(len(AppPermission.objects.get_permission_targets(
-            'testapp.have.testapp.testmodel', grouper)), 1)
-
-
 __all__ = (
     'AssignTest',
     'AssignUserTest',
@@ -326,5 +297,4 @@ __all__ = (
     'AssignTestWithLongDottedCodename',
     'RemoveUserTest',
     'RemoveGroupTest',
-    'GetPermissionTargetsTest',
 )

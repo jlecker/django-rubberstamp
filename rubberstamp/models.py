@@ -120,23 +120,6 @@ class AppPermissionManager(models.Manager):
             assigned.delete()
             return assigned
     
-    def get_permission_targets(self, permission, user):
-        """
-        Given a (long) permission string and a user, returns a QuerySet of
-        objects for which that user has that permission.
-        """
-        
-        (perm, ct) = self.get_permission_and_content_type(permission)
-        
-        q = models.Q(
-                permission=perm,
-                content_type=ct,
-                object_id__isnull=False
-            ) & get_perm_q_for_user(user)
-        
-        obj_ids = AssignedPermission.objects.filter(q).values('object_id')
-        return ct.model_class().objects.filter(pk__in=obj_ids)
-    
     def get_by_natural_key(self, app_label, codename):
         return self.get(app_label=app_label, codename=codename)
         
